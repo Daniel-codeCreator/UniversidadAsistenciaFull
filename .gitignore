@@ -1,0 +1,62 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+.kotlin
+
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Generated/local files ###
+**/.env
+!.env.example
+!.env.docker.example
+**/.env.docker
+**/.venv/
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+
+### Mac OS ###
+.DS_Store
+.github/modernize/
+
+# Local facial recognition service
+facial-service/.env
+facial-service/.venv/
+facial-service/tmp/*
+!facial-service/tmp/.gitkeep
+facial-service/__pycache__/
+facial-service/app/__pycache__/
+facial-service/scripts/__pycache__/
+facial-service/tests/__pycache__/
+facial-service/.pytest_cache/
+facial-service/logs/

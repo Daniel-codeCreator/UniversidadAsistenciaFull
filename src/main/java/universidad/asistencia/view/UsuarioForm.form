@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="universidad.asistencia.view.UsuarioForm">
+  <grid id="userRoot" binding="panelPrincipal" layout-manager="GridLayoutManager" row-count="10" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="8" left="8" bottom="8" right="8"/>
+    <constraints><xy x="20" y="20" width="1120" height="600"/></constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="uTitle" class="javax.swing.JLabel">
+        <constraints><grid row="0" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="ADMINISTRACION DE USUARIOS"/></properties>
+      </component>
+      <component id="uExit" class="javax.swing.JButton" binding="btnSalir">
+        <constraints><grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="SALIR"/></properties>
+      </component>
+      <component id="uId" class="javax.swing.JTextField" binding="txtId">
+        <constraints><grid row="1" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties/>
+      </component>
+      <component id="uName" class="javax.swing.JTextField" binding="txtUsuario">
+        <constraints><grid row="2" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties/>
+      </component>
+      <component id="uPass" class="javax.swing.JPasswordField" binding="txtPassword">
+        <constraints><grid row="3" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties/>
+      </component>
+      <component id="uRole" class="javax.swing.JComboBox" binding="cmbRol">
+        <constraints><grid row="4" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties/>
+      </component>
+      <component id="uTeacher" class="javax.swing.JComboBox" binding="cmbDocente">
+        <constraints><grid row="5" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties/>
+      </component>
+      <component id="uIdL" class="javax.swing.JLabel">
+        <constraints><grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="ID"/></properties>
+      </component>
+      <component id="uNameL" class="javax.swing.JLabel">
+        <constraints><grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Usuario"/></properties>
+      </component>
+      <component id="uPassL" class="javax.swing.JLabel">
+        <constraints><grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Contraseña"/></properties>
+      </component>
+      <component id="uRoleL" class="javax.swing.JLabel">
+        <constraints><grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Rol"/></properties>
+      </component>
+      <component id="uTeacherL" class="javax.swing.JLabel">
+        <constraints><grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Docente"/></properties>
+      </component>
+      <component id="uActiveL" class="javax.swing.JLabel">
+        <constraints><grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Activo"/></properties>
+      </component>
+      <component id="uActive" class="javax.swing.JCheckBox" binding="chkActivo">
+        <constraints><grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/></constraints>
+        <properties/>
+      </component>
+      <component id="uFaceStatus" class="javax.swing.JLabel" binding="lblEstadoRostro">
+        <constraints><grid row="6" column="2" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Seleccione un usuario."/></properties>
+      </component>
+      <component id="uNew" class="javax.swing.JButton" binding="btnNuevo">
+        <constraints><grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Nuevo"/></properties>
+      </component>
+      <component id="uSave" class="javax.swing.JButton" binding="btnGuardar">
+        <constraints><grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Guardar"/></properties>
+      </component>
+      <component id="uUpdate" class="javax.swing.JButton" binding="btnActualizar">
+        <constraints><grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Actualizar"/></properties>
+      </component>
+      <component id="uState" class="javax.swing.JButton" binding="btnDesactivar">
+        <constraints><grid row="7" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Desactivar"/></properties>
+      </component>
+      <component id="uFaceRegister" class="javax.swing.JButton" binding="btnRegistrarRostro">
+        <constraints><grid row="7" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Registrar rostro"/></properties>
+      </component>
+      <component id="uFaceDelete" class="javax.swing.JButton" binding="btnEliminarRostro">
+        <constraints><grid row="7" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Eliminar rostro"/></properties>
+      </component>
+      <component id="uSearchL" class="javax.swing.JLabel">
+        <constraints><grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Buscar usuario"/></properties>
+      </component>
+      <component id="uSearch" class="javax.swing.JTextField" binding="txtBuscar">
+        <constraints><grid row="8" column="1" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties/>
+      </component>
+      <component id="uFind" class="javax.swing.JButton" binding="btnBuscar">
+        <constraints><grid row="8" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/></constraints>
+        <properties><text value="Buscar"/></properties>
+      </component>
+      <scrollpane id="uScroll">
+        <constraints><grid row="9" column="0" row-span="1" col-span="6" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/></constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="uTable" class="javax.swing.JTable" binding="tblUsuarios">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
+    </children>
+  </grid>
+</form>
