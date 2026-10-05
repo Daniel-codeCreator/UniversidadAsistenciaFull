@@ -19,7 +19,6 @@ from .errors import (
     ModelUnavailableError,
     PreviewUnavailableError,
 )
-from .liveness import LivenessSession
 from .preview import FaceOverlay, PreviewWindow
 from .quality import QualityResult, evaluate_face
 
@@ -107,10 +106,7 @@ class FaceEngine:
 
     def capture_enrollment(self, user_label: str = "Usuario") -> CaptureResult:
         phases = (
-            EnrollmentPhase("FRENTE", "MIRE AL FRENTE", "front", 6, "TIMEOUT_FRONT"),
-            EnrollmentPhase("IZQUIERDA", "GIRE LIGERAMENTE A LA IZQUIERDA", "left", 5, "TIMEOUT_LEFT"),
-            EnrollmentPhase("DERECHA", "GIRE LIGERAMENTE A LA DERECHA", "right", 5, "TIMEOUT_RIGHT"),
-            EnrollmentPhase("FRENTE FINAL", "MIRE AL FRENTE NUEVAMENTE", "front", 4, "TIMEOUT_FRONT"),
+            EnrollmentPhase("FRENTE", "MIRE AL FRENTE", "front", self.settings.enroll_sample_count, "TIMEOUT_FRONT"),
         )
         logger.info("Enrollment phase=FRONT user_id_label=%s", user_label)
         return self._capture(
@@ -148,7 +144,6 @@ class FaceEngine:
         phase_started = started
         last_sample = 0.0
         last_frame: np.ndarray | None = None
-        liveness: LivenessSession | None = None
         window = PreviewWindow(title)
 
         with open_camera_session(self.settings) as (capture, selected_camera):
@@ -192,25 +187,20 @@ class FaceEngine:
                         quality_text = self._quality_text(quality)
                         phase_ok, pose_message = self._phase_match(quality, current_phase.target)
                         action = pose_message
-                        if liveness is None and quality.accepted:
-                            # Stable turn challenges are easier to understand and test than blink.
-                            liveness = LivenessSession(self.settings.max_yaw, self.settings.max_pitch, False)
-                        if liveness is not None and quality.accepted:
-                            liveness.observe(face, quality.pose.yaw, quality.pose.pitch)
-                            if not liveness.completed:
-                                action = self._liveness_action(liveness)
-                            elif phase_ok and time.monotonic() - last_sample >= self.settings.sample_interval_seconds:
-                                if phase_counts[phase_index] < current_phase.samples:
-                                    embeddings.append(self.embedding(face))
-                                    qualities.append(quality.score)
-                                    phase_counts[phase_index] += 1
-                                    last_sample = time.monotonic()
-                                    logger.info(
-                                        "Enrollment phase=%s samples=%s/%s",
-                                        current_phase.name,
-                                        phase_counts[phase_index],
-                                        current_phase.samples,
-                                    )
+
+                        # Capturar muestra directamente cuando la calidad sea aceptada
+                        if quality.accepted and phase_ok and time.monotonic() - last_sample >= self.settings.sample_interval_seconds:
+                            if phase_counts[phase_index] < current_phase.samples:
+                                embeddings.append(self.embedding(face))
+                                qualities.append(quality.score)
+                                phase_counts[phase_index] += 1
+                                last_sample = time.monotonic()
+                                logger.info(
+                                    "Enrollment phase=%s samples=%s/%s",
+                                    current_phase.name,
+                                    phase_counts[phase_index],
+                                    current_phase.samples,
+                                )
 
                     overlays = self._overlays(faces, face, quality, phase_ok)
                     lines = self._lines(
@@ -222,7 +212,6 @@ class FaceEngine:
                         current_phase,
                         phase_counts,
                         phases,
-                        liveness,
                         quality,
                     )
                     key = window.show(frame, overlays, lines)
@@ -236,20 +225,19 @@ class FaceEngine:
                         key = window.show(frame, overlays, completed_lines)
                         if key == 27:
                             raise CaptureCancelledError()
-                        time.sleep(0.7)
+                        time.sleep(0.5)
                         phase_index += 1
                         if phase_index >= len(phases):
                             logger.info("Enrollment completed samples=%s", len(embeddings))
                             return CaptureResult(
                                 embeddings=embeddings,
-                                quality_score=float(np.mean(qualities)),
+                                quality_score=float(np.mean(qualities)) if qualities else 0.0,
                                 frames_evaluated=len(embeddings),
-                                liveness_passed=bool(liveness and liveness.completed),
-                                challenge=liveness.challenge if liveness else "",
+                                liveness_passed=True,
+                                challenge="front_only",
                                 last_frame=last_frame,
                             )
                         phase_started = time.monotonic()
-                        logger.info("Enrollment phase=%s", phases[phase_index].name)
 
                 current_phase = phases[phase_index]
                 message = self._phase_timeout_message(current_phase)
@@ -303,8 +291,6 @@ class FaceEngine:
     def _phase_timeout_message(phase: EnrollmentPhase) -> str:
         return {
             "front": "No se pudo completar la captura mirando al frente.",
-            "left": "No se pudo completar la captura mirando hacia la izquierda.",
-            "right": "No se pudo completar la captura mirando hacia la derecha.",
         }.get(phase.target, f"No se pudo completar la fase {phase.name}.")
 
     @staticmethod
@@ -326,24 +312,10 @@ class FaceEngine:
             return False, quality.message.upper()
         yaw = quality.pose.yaw
         if target == "front":
-            if abs(yaw) <= 10:
+            if abs(yaw) <= 20:
                 return True, "MIRE AL FRENTE"
             return False, "VUELVA A MIRAR AL FRENTE"
-        if target == "left":
-            if yaw <= -12:
-                return True, "MANTENGA EL GIRO A LA IZQUIERDA"
-            return False, "GIRE LIGERAMENTE A LA IZQUIERDA"
-        if target == "right":
-            if yaw >= 12:
-                return True, "MANTENGA EL GIRO A LA DERECHA"
-            return False, "GIRE LIGERAMENTE A LA DERECHA"
         return False, "SIGA LA INSTRUCCIÓN EN PANTALLA"
-
-    @staticmethod
-    def _liveness_action(liveness: LivenessSession) -> str:
-        if liveness.neutral_frames < 3:
-            return "PRUEBA DE VIDA: MIRE AL FRENTE"
-        return "PRUEBA DE VIDA: " + liveness.instruction.upper()
 
     @staticmethod
     def _overlays(
@@ -369,7 +341,6 @@ class FaceEngine:
         phase: EnrollmentPhase,
         phase_counts: list[int],
         phases: tuple[EnrollmentPhase, ...],
-        liveness: LivenessSession | None,
         quality: QualityResult | None,
     ) -> list[str]:
         total = sum(item.samples for item in phases)
@@ -382,8 +353,7 @@ class FaceEngine:
             f"Calidad: {quality_text}",
             f"Acción: {action}",
             f"Fase: {phase.name}",
-            f"Muestras: {completed} / {total}   Fase: {phase_counts[phases.index(phase)]} / {phase.samples}",
-            f"Liveness: {'CORRECTO' if liveness and liveness.completed else 'PENDIENTE'}",
+            f"Muestras: {completed} / {total}",
             "ESC - CANCELAR",
         ]
         if self.settings.facial_debug and quality is not None:

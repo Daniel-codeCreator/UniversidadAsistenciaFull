@@ -10,7 +10,7 @@ public class DatabaseConnection {
             "universidad.db.url", "DB_URL",
             "jdbc:sqlserver://localhost:1433;databaseName=UniversidadAsistenciaDB;encrypt=true;trustServerCertificate=true;sendTimeAsDatetime=false;");
     private static final String USER = configuracion("universidad.db.user", "DB_USER", "sa");
-    private static final String PASSWORD = configuracion("universidad.db.password", "DB_PASSWORD", "Dev2025!");
+    private static final String PASSWORD = configuracion("universidad.db.password", "DB_PASSWORD", "Grupo4Progra1!");
 
     private DatabaseConnection() {
     }

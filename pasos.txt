@@ -1,0 +1,107 @@
+1. Configuración del Entorno Virtual de Python
+Abre PowerShell en la carpeta raíz del proyecto facial-service:
+
+PowerShell
+# 1. Navegar al directorio del servicio facial
+cd "C:\Users\dboc9\Desktop\Tareas UMG\Programacion2\universidadAsistenciaWithFaceRecon\universidadAsistencia\facial-service"
+
+# 2. Crear el entorno virtual (si no está creado)
+python -m venv .venv
+
+# 3. Activar el entorno virtual
+.\.venv\Scripts\Activate.ps1
+2. Instalación de Dependencias
+Instala los paquetes de Python necesarios (InsightFace, ONNX Runtime, OpenCV, PyODBC, FastAPI y Uvicorn):
+
+PowerShell
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install insightface onnxruntime opencv-python pyodbc fastapi uvicorn pydantic python-dotenv
+3. Configuración del Archivo de Entorno (.env)
+Crea o edita el archivo .env dentro de la carpeta facial-service con los siguientes datos de conexión y parámetros:
+
+Fragmento de código
+# SQL Server Configuration
+DB_HOST=127.0.0.1
+DB_PORT=1433
+DB_NAME=UniversidadAsistencia
+DB_USER=sa
+DB_PASSWORD=Grupo4Progra1!
+DB_DRIVER=ODBC Driver 18 for SQL Server
+DB_ENCRYPT=yes
+DB_TRUST_SERVER_CERTIFICATE=yes
+
+# Clave de cifrado biométrico
+FACIAL_ENCRYPTION_KEY=ncsDgw5e8Pj8NsWtE6chJZ04BcGeFVBXoAPzJnGH5kw=
+
+# Servidor API
+FACIAL_HOST=127.0.0.1
+FACIAL_PORT=8765
+SHOW_PREVIEW=true
+FACIAL_DEBUG=false
+
+# Modelo e Inferencia
+FACE_MODEL=buffalo_l
+FACE_MATCH_THRESHOLD=0.55
+FACE_MIN_SIZE=120
+BLUR_THRESHOLD=40
+BRIGHTNESS_MIN=20
+BRIGHTNESS_MAX=220
+MAX_YAW=35
+MAX_PITCH=30
+ENROLL_SAMPLE_COUNT=8
+VERIFY_SAMPLE_COUNT=7
+ENROLL_TIMEOUT_SECONDS=60
+VERIFY_TIMEOUT_SECONDS=20
+SAMPLE_INTERVAL_SECONDS=0.15
+
+ONNX_PROVIDERS=auto
+4. Estructura de app/engine.py (Captura Frontal Simplificada)
+Asegúrate de que el archivo app/engine.py tenga configurada la captura biométrica reducida únicamente a la fase frontal:
+
+Python
+def capture_enrollment(self, user_label: str = "Usuario") -> CaptureResult:
+    phases = (
+        EnrollmentPhase("FRENTE", "MIRE AL FRENTE", "front", self.settings.enroll_sample_count, "TIMEOUT_FRONT"),
+    )
+    logger.info("Enrollment phase=FRONT user_id_label=%s", user_label)
+    return self._capture(
+        sample_count=self.settings.enroll_sample_count,
+        timeout_seconds=self.settings.enroll_timeout_seconds,
+        title="Universidad Asistencia - Registro Facial",
+        user_label=user_label,
+        phases=phases,
+    )
+5. Primera Ejecución y Descarga del Modelo buffalo_l
+La primera vez que arranques el backend, InsightFace descargará automáticamente los modelos requeridos (det_10g.onnx, w600k_r50.onnx, etc.) a la carpeta C:\Users\<usuario>\.insightface\models\buffalo_l.
+
+Inicia el servicio desde PowerShell:
+
+PowerShell
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8765
+Nota: Deja esta ventana abierta mientras ejecutes el enrolamiento o la aplicación Java.
+
+6. Enrolamiento Biométrico del Usuario (enroll_user.py)
+Con el servidor API en ejecución en la Ventana 1, abre una segunda ventana de PowerShell para registrar la cara del usuario 1002 (o admin):
+
+PowerShell
+# Navegar a la carpeta del proyecto
+cd "C:\Users\dboc9\Desktop\Tareas UMG\Programacion2\universidadAsistenciaWithFaceRecon\universidadAsistencia\facial-service"
+
+# Ejecutar el enrolamiento pasando la variable PYTHONPATH
+$env:PYTHONPATH="." ; .\.venv\Scripts\python.exe scripts/enroll_user.py --user-id 1002
+Respuesta esperada en consola:
+JSON
+{
+  "success": true,
+  "userId": 1002,
+  "model": "buffalo_l",
+  "dimension": 512,
+  "samples": 8,
+  "qualityScore": 0.76,
+  "livenessPassed": true,
+  "message": "Perfil facial registrado correctamente."
+}
+7. Verificación del Sistema
+Prueba de Salud (Navegador): Abre [http://127.0.0.1:8765/health](http://127.0.0.1:8765/health) para confirmar el estado de la API.
+
+Inicio de Sesión en Java: Ejecuta la aplicación Java Swing, ingresa con el usuario admin y presiona Iniciar sesión. La cámara se abrirá automáticamente para validar el rostro
